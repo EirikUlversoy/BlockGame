@@ -43,7 +43,7 @@ public class BlockScript : MonoBehaviour {
     if (isFalling) {
       float actualFallSpeed = Mathf.Min(30f, fallSpeed * fallSpeedMultiplier);
       if (Input.GetKey( KeyCode.S ) || Input.GetKey( KeyCode.DownArrow)) {
-        actualFallSpeed = Mathf.Max(30f, actualFallSpeed);
+        actualFallSpeed = Mathf.Max(10f, actualFallSpeed);
       }
       transform.position += Vector3.down * actualFallSpeed * Time.deltaTime;
       float columnHeight = manager.currentHeights[column];

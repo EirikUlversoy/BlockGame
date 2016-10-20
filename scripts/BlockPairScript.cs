@@ -24,6 +24,10 @@ public class BlockPairScript : MonoBehaviour {
 
   public int orientation = 0;  // Left is pivot, right is oriented 90 * orientation degrees
 
+  private float leftHoldTime = 0;
+  private float rightHoldTime = 0;
+  private float holdTime = 0.5f;  // Hold time until blocks slide
+
 
   void Awake() {
     initializeBlockInstance();
@@ -73,7 +77,7 @@ public class BlockPairScript : MonoBehaviour {
       previewRightBlock.GetComponent<MeshRenderer>().material.color = getColorByType(previewRightType);
     }
 
-    leftBlock.SetFallSpeed(0.2f + 0.3f * manager.speed);
+    leftBlock.SetFallSpeed(1f + 0.3f * manager.speed);
 
     leftBlock.isLeft = true;
     rightBlock.isLeft = false;
@@ -129,10 +133,25 @@ public class BlockPairScript : MonoBehaviour {
 
     if (Input.GetKeyDown( KeyCode.A ) || Input.GetKeyDown( KeyCode.LeftArrow)) {
       tryHorizontalMove(-1);
+      leftHoldTime = 0;
     }
     if (Input.GetKeyDown( KeyCode.D ) || Input.GetKeyDown( KeyCode.RightArrow)) {
       tryHorizontalMove(1);
+      rightHoldTime = 0;
     }
+    if (Input.GetKey( KeyCode.A ) || Input.GetKey( KeyCode.LeftArrow)) {
+      leftHoldTime += Time.deltaTime;
+      if (leftHoldTime > holdTime) {
+        tryHorizontalMove(-1);
+      }
+    }
+    if (Input.GetKey( KeyCode.D ) || Input.GetKey( KeyCode.RightArrow)) {
+      rightHoldTime += Time.deltaTime;
+      if (rightHoldTime > holdTime) {
+        tryHorizontalMove(1);
+      }
+    }
+    // Drop is handled via blockpair speed
     // if (Input.GetKeyDown( KeyCode.S ) || Input.GetKeyDown( KeyCode.DownArrow)) {
     //   tryDrop(1);
     // }
@@ -174,11 +193,6 @@ public class BlockPairScript : MonoBehaviour {
     }
   }
 
-  // private void tryDrop (int amount) {
-  //   if (leftBlock != null) leftBlock.transform.position += Vector3.down * amount;
-  //   if (rightBlock != null) rightBlock.transform.position += Vector3.down * amount;
-  // }
-
   public void tryFullDrop() {
     if (leftBlock == null || rightBlock == null) {
       if (leftBlock != null) leftBlock.AddBlockToColumn();
@@ -204,10 +218,16 @@ public class BlockPairScript : MonoBehaviour {
     else if (newDirection == 3) testPositionOffset = new Vector3(0,-1,0);
 
     Vector3 testPosition = leftBlock.transform.position + testPositionOffset;
-    if (testPosition.x < 0 || testPosition.x >= towerWidth) return;
+    if (testPosition.x < 0 || testPosition.x >= towerWidth) {
+      trySwapRotate(direction);
+      return;
+    }
 
     float newTestColumnHeight = manager.currentHeights[Mathf.FloorToInt(testPosition.x)];
-    if (testPosition.y < newTestColumnHeight) return;
+    if (testPosition.y < newTestColumnHeight) {
+      trySwapRotate(direction);
+      return;
+    }
 
     orientation = newDirection;
     rightBlock.column = Mathf.FloorToInt(testPosition.x);
@@ -215,6 +235,45 @@ public class BlockPairScript : MonoBehaviour {
 
   }
 
+  private void trySwapRotate(int direction) {
+    if (leftBlock == null || rightBlock == null) return;
+
+    int newDirection = (-direction + 4 + orientation) % 4;
+    Vector3 testPositionOffset = Vector3.zero;
+    if (newDirection == 0) testPositionOffset = new Vector3(1,0,0);
+    else if (newDirection == 1) testPositionOffset = new Vector3(0,1,0);
+    else if (newDirection == 2) testPositionOffset = new Vector3(-1,0,0);
+    else if (newDirection == 3) testPositionOffset = new Vector3(0,-1,0);
+
+    Vector3 testPosition = leftBlock.transform.position + testPositionOffset;
+    if (testPosition.x < 0 || testPosition.x >= towerWidth) {
+      doSwap();
+      return;
+    }
+
+    float newTestColumnHeight = manager.currentHeights[Mathf.FloorToInt(testPosition.x)];
+    if (testPosition.y < newTestColumnHeight) {
+      doSwap();
+      return;
+    }
+
+    orientation = (newDirection + 2) % 4;
+    rightBlock.column = leftBlock.column;
+    rightBlock.transform.position = leftBlock.transform.position;
+    leftBlock.column = Mathf.FloorToInt(testPosition.x);
+    leftBlock.transform.position = testPosition;
+
+  }
+
+  void doSwap() {
+    orientation = (orientation + 2) % 4;
+    int tempColumn = rightBlock.column;
+    Vector3 tempPosition = rightBlock.transform.position;
+    rightBlock.column = leftBlock.column;
+    rightBlock.transform.position = leftBlock.transform.position;
+    leftBlock.column = tempColumn;
+    leftBlock.transform.position = tempPosition;
+  }
 
   void Update() {
     if (isActive) {
