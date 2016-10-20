@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using BlockGame;
 
 public class BlockPairScript : MonoBehaviour {
 
 
-  public GameObject blockPrefab;
+  private GameObject blockInstance;
   public int towerHeight;
   public int towerWidth;
 
@@ -24,15 +25,34 @@ public class BlockPairScript : MonoBehaviour {
   public int orientation = 0;  // Left is pivot, right is oriented 90 * orientation degrees
 
 
-  public void InitializePreviewBlocks(GameObject leftPreview, GameObject rightPreview) {
-    previewLeftBlock = leftPreview;
-    previewRightBlock = rightPreview;
+  void Awake() {
+    initializeBlockInstance();
+  }
+
+  public void InitializePreviewBlocks() {
+
+    previewLeftBlock = GameObject.CreatePrimitive(PrimitiveType.Cube);
+    previewLeftBlock.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/UnlitMaterial");
+
+    previewLeftBlock.transform.position = new Vector3(-1, 14, 0);
+    previewRightBlock = (GameObject) Instantiate(previewLeftBlock, new Vector3(6, 14, 0), Quaternion.identity);
+
+    previewLeftBlock.name = "PreviewBlock_Left";
+    previewRightBlock.name = "PreviewBlock_Right";
 
     previewLeftType = getRandomElement();
     previewRightType = getRandomElement();
 
     previewLeftBlock.GetComponent<MeshRenderer>().material.color = getColorByType(previewLeftType);
     previewRightBlock.GetComponent<MeshRenderer>().material.color = getColorByType(previewRightType);
+  }
+
+  private void initializeBlockInstance() {
+    blockInstance = GameObject.CreatePrimitive(PrimitiveType.Cube);
+    blockInstance.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/UnlitMaterial");
+    blockInstance.name = "Block";
+    blockInstance.AddComponent<BlockScript>();
+    blockInstance.SetActive(false);
   }
 
 
@@ -43,7 +63,15 @@ public class BlockPairScript : MonoBehaviour {
     leftBlock = SpawnBlock(previewLeftType, 2);
     rightBlock = SpawnBlock(previewRightType, 3);
 
-    InitializePreviewBlocks(previewLeftBlock, previewRightBlock);
+    if (previewLeftBlock == null) {
+      InitializePreviewBlocks();
+    } else {
+      previewLeftType = getRandomElement();
+      previewRightType = getRandomElement();
+
+      previewLeftBlock.GetComponent<MeshRenderer>().material.color = getColorByType(previewLeftType);
+      previewRightBlock.GetComponent<MeshRenderer>().material.color = getColorByType(previewRightType);
+    }
 
     leftBlock.SetFallSpeed(0.2f + 0.3f * manager.speed);
 
@@ -86,7 +114,8 @@ public class BlockPairScript : MonoBehaviour {
   }
 
   public BlockScript SpawnBlock(string type, int column) {
-    GameObject blockObject = (GameObject) Instantiate(blockPrefab, new Vector3(column, towerHeight + 1, 0), Quaternion.identity);
+    GameObject blockObject = (GameObject) Instantiate(blockInstance, new Vector3(column, towerHeight + 1, 0), Quaternion.identity);
+    blockObject.SetActive(true);
     BlockScript block = blockObject.GetComponent<BlockScript>();
     block.column = column;
     block.type = type;

@@ -10,13 +10,11 @@ public class ManagerScript : MonoBehaviour {
   public GameObject[,] blockGrid;
   public int[] currentHeights;
 
-  public GameObject wall_left;
-  public GameObject wall_right;
-  public GameObject previewLeft;
-  public GameObject previewRight;
-  public GameObject ground;
-  public GameObject background;
-  public GameObject blockPrefab;
+  private GameObject wall_left;
+  private GameObject wall_right;
+  private GameObject ground;
+  private GameObject background;
+
   public GameObject destroyBlockPrefab;
 
   private BlockPairScript blockPair;
@@ -37,26 +35,62 @@ public class ManagerScript : MonoBehaviour {
     blockGrid = new GameObject[towerWidth,towerHeight];
     currentHeights = new int[6]{0,0,0,0,0,0};
 
-    wall_left.GetComponent<MeshRenderer>().material.color = Color.black;
-    wall_right.GetComponent<MeshRenderer>().material.color = Color.black;
-    ground.GetComponent<MeshRenderer>().material.color = Color.black;
+    initializeBlockWell();
 
-    blockPair = new GameObject().AddComponent<BlockPairScript>();
-    blockPair.blockPrefab = blockPrefab;
-    blockPair.towerHeight = towerHeight;
-    blockPair.towerWidth = towerWidth;
-    blockPair.manager = this;
-    blockPair.InitializePreviewBlocks(previewLeft, previewRight);
-    blockPair.InitializeBlockPair();
+    initializeBlockPair();
 
+    initializeDestroyBlock();
+
+    initializeScoreText();
+
+    initializeAlertText();
+
+    // Initialize level with some blocks
     AddBlockToColumn(blockPair.SpawnBlock("earth", 1).gameObject);
     AddBlockToColumn(blockPair.SpawnBlock("air", 2).gameObject);
     AddBlockToColumn(blockPair.SpawnBlock("water", 3).gameObject);
     AddBlockToColumn(blockPair.SpawnBlock("fire", 4).gameObject);
-
-    initializeScoreText ();
-    initializeAlertText ();
 	}
+
+
+  private void initializeBlockWell () {
+    wall_left = GameObject.CreatePrimitive(PrimitiveType.Cube);
+    wall_left.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/UnlitMaterial");
+
+    wall_left.transform.position = new Vector3(-1, 7, 0);
+    wall_right = (GameObject) Instantiate(wall_left, new Vector3(6, 7, 0), Quaternion.identity);
+    ground = (GameObject) Instantiate(wall_left, new Vector3(2.5f, 0, 0), Quaternion.identity);
+    background = (GameObject) Instantiate(wall_left, new Vector3(2.5f, 7, 1), Quaternion.identity);
+
+    wall_left.transform.localScale = new Vector3(1,13,1);
+    wall_right.transform.localScale = new Vector3(1,13,1);
+    ground.transform.localScale = new Vector3(8,1,1);
+    background.transform.localScale = new Vector3(20,15,1);
+
+    wall_left.name = "Wall_Left";
+    wall_right.name = "Wall_Right";
+    ground.name = "Ground";
+    background.name = "Background";
+
+    wall_left.GetComponent<MeshRenderer>().material.color = Color.black;
+    wall_right.GetComponent<MeshRenderer>().material.color = Color.black;
+    ground.GetComponent<MeshRenderer>().material.color = Color.black;
+    background.GetComponent<MeshRenderer>().material.color = Color.grey;
+  }
+
+  private void initializeDestroyBlock() {
+    destroyBlockPrefab = new GameObject();
+    destroyBlockPrefab.AddComponent<DestroyBlockScript>();
+  }
+
+  private void initializeBlockPair() {
+    blockPair = new GameObject().AddComponent<BlockPairScript>();
+    blockPair.towerHeight = towerHeight;
+    blockPair.towerWidth = towerWidth;
+    blockPair.manager = this;
+    blockPair.InitializePreviewBlocks();
+    blockPair.InitializeBlockPair();
+  }
 
   void initializeScoreText () {
     GameObject newCanvas = new GameObject("Canvas");
