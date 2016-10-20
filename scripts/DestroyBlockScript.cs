@@ -14,13 +14,18 @@ public class DestroyBlockScript : MonoBehaviour {
   private int towerHeight;
 
   private int scoreMultiplier = 0;
-  private int numDestroyedBlocks = 0;
+  private int numBlocksToDestroy = 0;
+
+  private GameObject[] blocksToDestroy;
+  private float blockDestroySpeed = 5f;
 
   public void DoDestroy(int leftOfBlock, int bottomOfBlock, string type, ManagerScript setManager, int setScoreMultiplier) {
     manager = setManager;
     towerHeight = manager.towerHeight;
     towerWidth = manager.towerWidth;
     scoreMultiplier = setScoreMultiplier;
+
+    blocksToDestroy = new GameObject[(towerHeight - 1) * (towerWidth - 1)];
 
     blockCheckGrid = new bool[towerWidth, towerHeight];
     minHeightOfDestroyedBlocks = new int[towerWidth];
@@ -34,32 +39,13 @@ public class DestroyBlockScript : MonoBehaviour {
     for (int i = 0 ; i < towerWidth ; i++) {
       for (int j = 0 ; j < towerHeight ; j++) {
         if (blockCheckGrid[i,j]) {
-          Destroy(blockGrid[i,j].gameObject);
-          numDestroyedBlocks++;
+          // Destroy(blockGrid[i,j].gameObject);
+          blocksToDestroy[numBlocksToDestroy] = blockGrid[i,j].gameObject;
+          numBlocksToDestroy++;
           blockGrid[i,j] = null;
         }
       }
     }
-    manager.addPoints(numDestroyedBlocks * (scoreMultiplier + 1) * manager.speed);
-
-    for (int i = 0 ; i < towerWidth ; i++) {
-      int minHeightOfColumn = minHeightOfDestroyedBlocks[i];
-      for (int j = minHeightOfColumn + 1 ; j < towerHeight ; j++) {
-        GameObject blockObject = blockGrid[i,j];
-        if (blockObject == null) {
-          continue;
-        } else {
-          blockGrid[i,j] = null;
-          blockObject.GetComponent<BlockScript>().fallSpeedMultiplier = 8;
-          blockObject.GetComponent<BlockScript>().isFalling = true;
-          blockObject.GetComponent<BlockScript>().destroyBlock = this;
-          numFallingBlocks++;
-        }
-      }
-    }
-
-    if (numFallingBlocks <= 0) finishDestroy();
-
   }
 
   private void checkBlock(int i, int j, string type) {
@@ -89,5 +75,47 @@ public class DestroyBlockScript : MonoBehaviour {
       finishDestroy();
     }
   }
+
+  private void endDestroyBlocks() {
+    manager.addPoints(numBlocksToDestroy * (scoreMultiplier + 1) * manager.speed);
+    for (int i = 0 ; i < numBlocksToDestroy ; i++) {
+      Destroy(blocksToDestroy[i]);
+      blocksToDestroy[i] = null;
+    }
+    numBlocksToDestroy = 0;
+
+    // Set blocks to fall
+    for (int i = 0 ; i < towerWidth ; i++) {
+      int minHeightOfColumn = minHeightOfDestroyedBlocks[i];
+      for (int j = minHeightOfColumn + 1 ; j < towerHeight ; j++) {
+        GameObject blockObject = blockGrid[i,j];
+        if (blockObject == null) {
+          continue;
+        } else {
+          blockGrid[i,j] = null;
+          blockObject.GetComponent<BlockScript>().fallSpeedMultiplier = 10;
+          blockObject.GetComponent<BlockScript>().isFalling = true;
+          blockObject.GetComponent<BlockScript>().destroyBlock = this;
+          numFallingBlocks++;
+        }
+      }
+    }
+
+    if (numFallingBlocks <= 0) finishDestroy();
+
+  }
+
+  void Update() {
+    if (numBlocksToDestroy > 0) {
+      for (int i = 0 ; i < numBlocksToDestroy ; i++) {
+        blocksToDestroy[i].transform.localScale -= new Vector3(1,1,0) * Time.deltaTime * blockDestroySpeed;
+      }
+      if (blocksToDestroy[0].transform.localScale.x <= 0) {
+        endDestroyBlocks();
+      }
+    }
+
+  }
+
 
 }

@@ -53,6 +53,7 @@ public class BlockPairScript : MonoBehaviour {
 
   private void initializeBlockInstance() {
     blockInstance = GameObject.CreatePrimitive(PrimitiveType.Cube);
+    Destroy(blockInstance.GetComponent<BoxCollider>());
     blockInstance.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/UnlitMaterial");
     blockInstance.name = "Block";
     blockInstance.AddComponent<BlockScript>();
