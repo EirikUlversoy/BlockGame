@@ -110,6 +110,9 @@ public class DestroyBlockScript : MonoBehaviour {
       manager.addPoints(numBlocksToDestroy * (scoreMultiplier + 1) * manager.speed);
     }
     for (int i = 0 ; i < numBlocksToDestroy ; i++) {
+      if (blocksToDestroy[i].GetComponent<DiamondScript>()) {
+        blocksToDestroy[i].GetComponent<DiamondScript>().RemoveDiamondScript();
+      }
       Destroy(blocksToDestroy[i]);
       blocksToDestroy[i] = null;
     }
