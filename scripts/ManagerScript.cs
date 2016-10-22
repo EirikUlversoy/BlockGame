@@ -50,7 +50,7 @@ public class ManagerScript : MonoBehaviour {
 
     initializeAlertText();
 
-    flashPermanentAlert("PRESS ANY KEY TO BEGIN");
+    flashPermanentAlert("PRESS ENTER TO BEGIN");
 	}
 
   private void startNewGame() {
@@ -58,6 +58,7 @@ public class ManagerScript : MonoBehaviour {
     gameOver = false;
     speed = 1;
     score = 0;
+    updateText();
 
     // Destroy all blocks
     for (int i = 0 ; i < blockGrid.GetLength(0) ; i++) {
@@ -272,7 +273,7 @@ public class ManagerScript : MonoBehaviour {
     gameOver = true;
     blockPair.isActive = false;
     blockPair.gameOver = true;
-    flashPermanentAlert("GAME OVER\n\nPRESS ANY KEY TO BEGIN");
+    flashPermanentAlert("GAME OVER\n\nPRESS ENTER TO BEGIN");
   }
 
   void Update() {
@@ -284,7 +285,7 @@ public class ManagerScript : MonoBehaviour {
   }
 
   void LateUpdate() {
-    if (gameOver && Input.anyKeyDown) {
+    if (gameOver && (Input.GetKeyDown( KeyCode.Return ) || Input.GetKeyDown( KeyCode.KeypadEnter ))) {
       startNewGame();
     }
   }
