@@ -37,14 +37,16 @@ public class BlockPairScript : MonoBehaviour {
 
   public void InitializePreviewBlocks() {
 
-    previewLeftBlock = GameObject.CreatePrimitive(PrimitiveType.Cube);
-    previewLeftBlock.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/UnlitMaterial");
+    if (previewLeftBlock == null) {
+      previewLeftBlock = GameObject.CreatePrimitive(PrimitiveType.Cube);
+      previewLeftBlock.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/UnlitMaterial");
 
-    previewLeftBlock.transform.position = new Vector3(-1, 14, 0);
-    previewRightBlock = (GameObject) Instantiate(previewLeftBlock, new Vector3(6, 14, 0), Quaternion.identity);
+      previewLeftBlock.transform.position = new Vector3(-1, 14, 0);
+      previewRightBlock = (GameObject) Instantiate(previewLeftBlock, new Vector3(6, 14, 0), Quaternion.identity);
 
-    previewLeftBlock.name = "PreviewBlock_Left";
-    previewRightBlock.name = "PreviewBlock_Right";
+      previewLeftBlock.name = "PreviewBlock_Left";
+      previewRightBlock.name = "PreviewBlock_Right";
+    }
 
     previewLeftType = getRandomElement();
     previewRightType = getRandomElement();

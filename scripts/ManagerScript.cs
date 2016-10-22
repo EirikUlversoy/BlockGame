@@ -33,6 +33,8 @@ public class ManagerScript : MonoBehaviour {
   private bool diamondTouch = false;
   private string diamondTouchColor = "";
 
+  private bool gameOver = true;
+
 	// Use this for initialization
 	void Awake () {
     blockGrid = new GameObject[towerWidth,towerHeight];
@@ -48,12 +50,44 @@ public class ManagerScript : MonoBehaviour {
 
     initializeAlertText();
 
-    // Initialize level with some blocks
+    flashPermanentAlert("PRESS ANY KEY TO BEGIN");
+	}
+
+  private void startNewGame() {
+    // Restart score and level
+    gameOver = false;
+    speed = 1;
+    score = 0;
+
+    // Destroy all blocks
+    for (int i = 0 ; i < blockGrid.GetLength(0) ; i++) {
+      for (int j = 0 ; j < blockGrid.GetLength(1) ; j++) {
+        GameObject blockObject = blockGrid[i,j];
+        if (blockObject != null) {
+          Destroy(blockObject);
+          blockGrid[i,j] = null;
+        }
+      }
+    }
+    if (blockPair.leftBlock != null) Destroy(blockPair.leftBlock.gameObject);
+    if (blockPair.rightBlock != null) Destroy(blockPair.rightBlock.gameObject);
+    currentHeights = new int[6]{0,0,0,0,0,0};
+
+    // Add start blocks to column
     AddBlockToColumn(blockPair.SpawnBlock("earth", 1).gameObject);
     AddBlockToColumn(blockPair.SpawnBlock("air", 2).gameObject);
     AddBlockToColumn(blockPair.SpawnBlock("water", 3).gameObject);
     AddBlockToColumn(blockPair.SpawnBlock("fire", 4).gameObject);
-	}
+
+    // initialize block pair
+    blockPair.isActive = true;
+    blockPair.gameOver = false;
+    blockPair.InitializePreviewBlocks();
+    blockPair.InitializeBlockPair();
+
+    flashPermanentAlert("");
+
+  }
 
 
   private void initializeBlockWell () {
@@ -92,8 +126,6 @@ public class ManagerScript : MonoBehaviour {
     blockPair.towerHeight = towerHeight;
     blockPair.towerWidth = towerWidth;
     blockPair.manager = this;
-    blockPair.InitializePreviewBlocks();
-    blockPair.InitializeBlockPair();
   }
 
   void initializeScoreText () {
@@ -127,14 +159,14 @@ public class ManagerScript : MonoBehaviour {
     alertTextObject.AddComponent<CanvasRenderer>();
     alertText = alertTextObject.AddComponent<Text>();
     alertText.rectTransform.anchoredPosition = new Vector2(280,0);
-    alertText.rectTransform.sizeDelta = new Vector2(200,140);
+    alertText.rectTransform.sizeDelta = new Vector2(200,600);
     alertText.text = "ALERT";
     alertText.transform.SetParent(newCanvas.transform, false);
     alertText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
     alertText.fontSize = 36;
     alertText.color = new Color(1,1,1,0);
     alertText.fontStyle = FontStyle.Bold;
-    alertText.alignment = TextAnchor.UpperLeft;
+    alertText.alignment = TextAnchor.MiddleLeft;
     alertTextObject.AddComponent<Shadow>().effectColor = Color.black;
   }
 
@@ -143,8 +175,16 @@ public class ManagerScript : MonoBehaviour {
     alertFlashTime = 1f;
   }
 
+  public void flashPermanentAlert(string textToFlash) {
+    alertText.text = textToFlash;
+    alertFlashTime = 0;
+    alertText.color = new Color(1,1,1,1);
+
+  }
+
   public void addPoints(int amount) {
     score += amount;
+    updateText();
   }
   public void increaseSpeed () {
     flashAlert("Speed Up!");
@@ -220,6 +260,7 @@ public class ManagerScript : MonoBehaviour {
     currentHeights[column]++;
     if (currentHeights[column] > towerHeight) {
       doGameOver();
+      Destroy(blockObject);
     } else {
       blockObject.transform.position = new Vector3(column, currentHeights[column], 0);
       if (blockGrid[column, currentHeights[column] - 1] != null) Debug.Log("WARNING: GRID SPOT OCCUPIED: " + column + ", " + currentHeights[column]);
@@ -228,10 +269,10 @@ public class ManagerScript : MonoBehaviour {
   }
 
   private void doGameOver() {
+    gameOver = true;
     blockPair.isActive = false;
     blockPair.gameOver = true;
-    alertText.text = "GAME OVER";
-    alertFlashTime = 100000f;
+    flashPermanentAlert("GAME OVER\n\nPRESS ANY KEY TO BEGIN");
   }
 
   void Update() {
@@ -240,6 +281,12 @@ public class ManagerScript : MonoBehaviour {
       alertFlashTime -= Time.deltaTime;
     }
 
+  }
+
+  void LateUpdate() {
+    if (gameOver && Input.anyKeyDown) {
+      startNewGame();
+    }
   }
 
 }
