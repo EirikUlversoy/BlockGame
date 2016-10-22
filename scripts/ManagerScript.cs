@@ -30,6 +30,9 @@ public class ManagerScript : MonoBehaviour {
 
   private int numBlocksDropped = 0;
 
+  private bool diamondTouch = false;
+  private string diamondTouchColor = "";
+
 	// Use this for initialization
 	void Awake () {
     blockGrid = new GameObject[towerWidth,towerHeight];
@@ -141,14 +144,15 @@ public class ManagerScript : MonoBehaviour {
   }
 
   public void addPoints(int amount) {
-    flashAlert("+" + amount + " points");
     score += amount;
-    updateText();
   }
   public void increaseSpeed () {
     flashAlert("Speed Up!");
     speed++;
     updateText();
+    if (speed % 10 == 0) {  // Spawn diamond every 10 levels
+      blockPair.QueueDiamond();
+    }
   }
 
   public void updateText() {
@@ -167,7 +171,18 @@ public class ManagerScript : MonoBehaviour {
     if (numBlocksDropped % 10 == 0) increaseSpeed();
   }
 
+  private void createDiamondDestroyBlock() {
+    diamondTouch = false;
+    GameObject destroyBlockObject = new GameObject();
+    DestroyBlockScript destroyBlock = destroyBlockObject.AddComponent<DestroyBlockScript>();
+    destroyBlock.DoDiamondDestroy(diamondTouchColor, this, 0);
+  }
+
   public void CheckForDestroyBlocks(int scoreMultiplier) {
+    if (diamondTouch) {
+      createDiamondDestroyBlock();
+      return;
+    }
     for (int i = 0 ; i < towerWidth - 1 ; i++) {
       for (int j = 0 ; j < towerHeight - 1 ; j++) {
         GameObject blockObject = blockGrid[i,j];
@@ -191,6 +206,15 @@ public class ManagerScript : MonoBehaviour {
 
   public void AddBlockToColumn(GameObject blockObject) {
     BlockScript block = blockObject.GetComponent<BlockScript>();
+    if (block.type == "diamond") {
+      diamondTouch = true;
+      if (currentHeights[block.column] > 0) {
+        diamondTouchColor = blockGrid[block.column, currentHeights[block.column] - 1].GetComponent<BlockScript>().type;
+      } else {
+        flashAlert("Tech Bonus");
+        diamondTouchColor = "";
+      }
+    }
     block.isFalling = false;
     int column = block.column;
     currentHeights[column]++;

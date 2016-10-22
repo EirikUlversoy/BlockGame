@@ -19,6 +19,8 @@ public class DestroyBlockScript : MonoBehaviour {
   private GameObject[] blocksToDestroy;
   private float blockDestroySpeed = 5f;
 
+  private int techBonusPointValue = 1000;
+
   public void DoDestroy(int leftOfBlock, int bottomOfBlock, string type, ManagerScript setManager, int setScoreMultiplier) {
     manager = setManager;
     towerHeight = manager.towerHeight;
@@ -39,8 +41,33 @@ public class DestroyBlockScript : MonoBehaviour {
     for (int i = 0 ; i < towerWidth ; i++) {
       for (int j = 0 ; j < towerHeight ; j++) {
         if (blockCheckGrid[i,j]) {
-          // Destroy(blockGrid[i,j].gameObject);
-          blocksToDestroy[numBlocksToDestroy] = blockGrid[i,j].gameObject;
+          blocksToDestroy[numBlocksToDestroy] = blockGrid[i,j];
+          numBlocksToDestroy++;
+          blockGrid[i,j] = null;
+        }
+      }
+    }
+  }
+
+  public void DoDiamondDestroy(string type, ManagerScript setManager, int setScoreMultiplier) {
+    manager = setManager;
+    towerHeight = manager.towerHeight;
+    towerWidth = manager.towerWidth;
+    scoreMultiplier = setScoreMultiplier;
+    blockGrid = manager.blockGrid;
+    blocksToDestroy = new GameObject[(towerHeight - 1) * (towerWidth - 1)];
+
+    minHeightOfDestroyedBlocks = new int[towerWidth];
+    for (int i = 0 ; i < minHeightOfDestroyedBlocks.Length ; i ++) {
+      minHeightOfDestroyedBlocks[i] = 10000;
+    }
+
+    for (int i = 0 ; i < towerWidth ; i++) {
+      for (int j = 0 ; j < towerHeight ; j++) {
+        if (blockGrid[i,j] != null && (blockGrid[i,j].GetComponent<BlockScript>().type == type || blockGrid[i,j].GetComponent<BlockScript>().type == "diamond")) {
+          if (manager.currentHeights[i] >= j) manager.currentHeights[i] = j;
+          minHeightOfDestroyedBlocks[i] = Mathf.Min(j, minHeightOfDestroyedBlocks[i]);
+          blocksToDestroy[numBlocksToDestroy] = blockGrid[i,j];
           numBlocksToDestroy++;
           blockGrid[i,j] = null;
         }
@@ -77,7 +104,11 @@ public class DestroyBlockScript : MonoBehaviour {
   }
 
   private void endDestroyBlocks() {
-    manager.addPoints(numBlocksToDestroy * (scoreMultiplier + 1) * manager.speed);
+    if (numBlocksToDestroy == 1) { // Diamond tech
+      manager.addPoints(techBonusPointValue);
+    } else {
+      manager.addPoints(numBlocksToDestroy * (scoreMultiplier + 1) * manager.speed);
+    }
     for (int i = 0 ; i < numBlocksToDestroy ; i++) {
       Destroy(blocksToDestroy[i]);
       blocksToDestroy[i] = null;

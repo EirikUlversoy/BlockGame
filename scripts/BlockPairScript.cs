@@ -28,6 +28,8 @@ public class BlockPairScript : MonoBehaviour {
   private float rightHoldTime = 0;
   private float holdTime = 0.5f;  // Hold time until blocks slide
 
+  private bool queueDiamond = false;
+
 
   void Awake() {
     initializeBlockInstance();
@@ -68,8 +70,17 @@ public class BlockPairScript : MonoBehaviour {
     leftBlock = SpawnBlock(previewLeftType, 2);
     rightBlock = SpawnBlock(previewRightType, 3);
 
+    if (previewRightType == "diamond") previewRightBlock.GetComponent<DiamondScript>().RemoveDiamondScript();
+
     if (previewLeftBlock == null) {
       InitializePreviewBlocks();
+    } else if (queueDiamond) {
+      previewLeftType = getRandomElement();
+      previewRightType = "diamond";
+      queueDiamond = false;
+
+      previewLeftBlock.GetComponent<MeshRenderer>().material.color = getColorByType(previewLeftType);
+      previewRightBlock.AddComponent<DiamondScript>();
     } else {
       previewLeftType = getRandomElement();
       previewRightType = getRandomElement();
@@ -125,7 +136,11 @@ public class BlockPairScript : MonoBehaviour {
     block.column = column;
     block.type = type;
 
-    blockObject.GetComponent<MeshRenderer>().material.color = getColorByType(type);
+    if (type == "diamond") {
+      blockObject.AddComponent<DiamondScript>();
+    } else {
+      blockObject.GetComponent<MeshRenderer>().material.color = getColorByType(type);
+    }
 
     return block;
   }
@@ -274,6 +289,10 @@ public class BlockPairScript : MonoBehaviour {
     rightBlock.transform.position = leftBlock.transform.position;
     leftBlock.column = tempColumn;
     leftBlock.transform.position = tempPosition;
+  }
+
+  public void QueueDiamond() {
+    queueDiamond = true;
   }
 
   void Update() {

@@ -36,6 +36,7 @@ public class BlockScript : MonoBehaviour {
       destroyBlock.BlockLanded();
     }
 
+
   }
 
 	// Update is called once per frame
