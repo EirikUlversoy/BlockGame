@@ -85,6 +85,7 @@ public class ManagerScript : MonoBehaviour {
 
   private void initializeBlockPair() {
     blockPair = new GameObject().AddComponent<BlockPairScript>();
+    blockPair.name = "BlockPair";
     blockPair.towerHeight = towerHeight;
     blockPair.towerWidth = towerWidth;
     blockPair.manager = this;
