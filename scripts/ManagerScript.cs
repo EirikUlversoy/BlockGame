@@ -15,8 +15,6 @@ public class ManagerScript : MonoBehaviour {
   private GameObject ground;
   private GameObject background;
 
-  public GameObject destroyBlockPrefab;
-
   private BlockPairScript blockPair;
 
   public int score = 0;
@@ -34,6 +32,8 @@ public class ManagerScript : MonoBehaviour {
   private string diamondTouchColor = "";
 
   private bool gameOver = true;
+
+  private DestroyBlockScript destroyBlockScript;
 
 	// Use this for initialization
 	void Awake () {
@@ -117,8 +117,8 @@ public class ManagerScript : MonoBehaviour {
   }
 
   private void initializeDestroyBlock() {
-    destroyBlockPrefab = new GameObject();
-    destroyBlockPrefab.AddComponent<DestroyBlockScript>();
+    destroyBlockScript = gameObject.AddComponent<DestroyBlockScript>();
+    destroyBlockScript.Initialize(this, blockPair, towerWidth, towerHeight);
   }
 
   private void initializeBlockPair() {
@@ -191,7 +191,7 @@ public class ManagerScript : MonoBehaviour {
     flashAlert("Speed Up!");
     speed++;
     updateText();
-    if (speed % 10 == 0) {  // Spawn diamond every 10 levels
+    if (speed % 10 == 2) {  // Spawn diamond every 10 levels
       blockPair.QueueDiamond();
     }
   }
@@ -201,9 +201,9 @@ public class ManagerScript : MonoBehaviour {
   }
 
   private void createDestroyBlock(int i, int j, string type, int scoreMultiplier) {
-    GameObject destroyBlockObject = (GameObject) Instantiate(destroyBlockPrefab, new Vector3( (2f * i + 1)/2, (2f * j + 1)/2 + 1, 0 ), Quaternion.identity);
-    DestroyBlockScript destroyBlock = destroyBlockObject.GetComponent<DestroyBlockScript>();
-    destroyBlock.DoDestroy(i, j, type, this, scoreMultiplier);
+    // GameObject destroyBlockObject = (GameObject) Instantiate(destroyBlockPrefab, new Vector3( (2f * i + 1)/2, (2f * j + 1)/2 + 1, 0 ), Quaternion.identity);
+    // DestroyBlockScript destroyBlock = destroyBlockObject.GetComponent<DestroyBlockScript>();
+    // destroyBlock.DoDestroy(i, j, type, this, scoreMultiplier);
 
   }
 
@@ -212,16 +212,19 @@ public class ManagerScript : MonoBehaviour {
     if (numBlocksDropped % 10 == 0) increaseSpeed();
   }
 
-  private void createDiamondDestroyBlock() {
-    diamondTouch = false;
-    GameObject destroyBlockObject = new GameObject();
-    DestroyBlockScript destroyBlock = destroyBlockObject.AddComponent<DestroyBlockScript>();
-    destroyBlock.DoDiamondDestroy(diamondTouchColor, this, 0);
-  }
-
   public void CheckForDestroyBlocks(int scoreMultiplier) {
     if (diamondTouch) {
-      createDiamondDestroyBlock();
+      // createDiamondDestroyBlock();
+      destroyBlockScript.DoDiamondDestroy(diamondTouchColor, scoreMultiplier);
+      diamondTouch = false;
+    } else {
+      destroyBlockScript.CheckForDestroyBlocks(scoreMultiplier);
+    }
+  }
+
+  public void TempCheckForDestroyBlocks(int scoreMultiplier) {
+    if (diamondTouch) {
+      CheckForDestroyBlocks(scoreMultiplier);
       return;
     }
     for (int i = 0 ; i < towerWidth - 1 ; i++) {

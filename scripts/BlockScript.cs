@@ -13,13 +13,16 @@ public class BlockScript : MonoBehaviour {
   public bool isLeft = false;
 
   public BlockPairScript blockPair;
-  public DestroyBlockScript destroyBlock;
+  public static DestroyBlockScript destroyBlock;
 
   ManagerScript manager;
 
 	// Use this for initialization
 	void Awake () {
     manager = GameObject.Find("Manager").GetComponent<ManagerScript>();
+    if (destroyBlock == null) {
+      destroyBlock = GameObject.Find("Manager").GetComponent<DestroyBlockScript>();
+    }
 	}
 
   public void SetFallSpeed(float newSpeed) {
