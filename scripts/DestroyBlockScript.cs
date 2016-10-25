@@ -21,6 +21,13 @@ public class DestroyBlockScript : MonoBehaviour {
 
   private int techBonusPointValue = 1000;
 
+  protected class DestroyRectangle {
+    public int leftOfBlock;
+    public int bottomOfBlock;
+    public int areaOfRectangle;
+    public string type;
+  }
+
   public void Initialize(ManagerScript setManager, BlockPairScript setBlockPair, int width, int height) {
     manager = setManager;
     towerWidth = width;
@@ -32,6 +39,7 @@ public class DestroyBlockScript : MonoBehaviour {
     scoreMultiplier = setScoreMultiplier;
     blockGrid = manager.blockGrid;
     blocksToDestroy = new GameObject[towerHeight * towerWidth];
+    numBlocksToDestroy = 0;
 
     minHeightOfDestroyedBlocks = new int[towerWidth];
     for (int i = 0 ; i < minHeightOfDestroyedBlocks.Length ; i ++) {
@@ -56,6 +64,8 @@ public class DestroyBlockScript : MonoBehaviour {
     blockGrid = manager.blockGrid;
     scoreMultiplier = setScoreMultiplier;
     numFallingBlocks = 0;
+    int numDestroyRectangles = 0;
+    DestroyRectangle[] destroyRectangles = new DestroyRectangle[16]; // Shouldn't ever go above 16
     for (int i = 0 ; i < towerWidth - 1 ; i++) {
       for (int j = 0 ; j < towerHeight - 1 ; j++) {
         GameObject blockObject = blockGrid[i,j];
@@ -66,15 +76,41 @@ public class DestroyBlockScript : MonoBehaviour {
         BlockScript blockScript = blockObject.GetComponent<BlockScript>();
         string type = blockScript.type;
         if (checkNode(type, new int[2]{i,j}, new int[2]{i+1,j+1}, true, true)) {
-          int rectangleDimensions = getMaxRectangleArea(i, j, type);
-          Debug.Log(rectangleDimensions);
-          startBlockDestroy(i, j, type);
-          return;
+          DestroyRectangle destroyRectangle = new DestroyRectangle();
+          destroyRectangle.leftOfBlock = i;
+          destroyRectangle.bottomOfBlock = j;
+          destroyRectangle.areaOfRectangle = getMaxRectangleArea(i, j, type);
+          destroyRectangle.type = type;
+          destroyRectangles[numDestroyRectangles] = destroyRectangle;
+          numDestroyRectangles++;
         }
       }
     }
-    blockPair.InitializeBlockPair();
+    if (numDestroyRectangles == 0) {
+      blockPair.InitializeBlockPair();
+    } else {
+      destroyRectangles = sortDestroyRectangles(destroyRectangles);
+      startBlockDestroy(destroyRectangles, numDestroyRectangles);
+    }
   }
+
+  // Bubble sort!
+  private DestroyRectangle[] sortDestroyRectangles(DestroyRectangle[] destroyRectangles) {
+    bool switched = true;
+    while (switched) {
+      switched = false;
+      for (int i = 0 ; i+1 < destroyRectangles.Length && destroyRectangles[i+1] != null ; i++) {
+        if (destroyRectangles[i].areaOfRectangle > destroyRectangles[i+1].areaOfRectangle) {
+          DestroyRectangle swapRectangle = destroyRectangles[i];
+          destroyRectangles[i] = destroyRectangles[i+1];
+          destroyRectangles[i+1] = swapRectangle;
+          switched = true;
+        }
+      }
+    }
+    return destroyRectangles;
+  }
+
 
   private int getMaxRectangleArea(int leftOfBlock, int bottomOfBlock, string type) {
     bool[,] blockVisitedGrid = new bool[towerWidth, towerHeight];
@@ -168,8 +204,9 @@ public class DestroyBlockScript : MonoBehaviour {
     return true;
   }
 
-  private void startBlockDestroy(int leftOfBlock, int bottomOfBlock, string type) {
+  private void startBlockDestroy(DestroyRectangle[] destroyRectangles, int numDestroyRectangles) {
     blocksToDestroy = new GameObject[(towerHeight - 1) * (towerWidth - 1)];
+    numBlocksToDestroy = 0;
     blockCheckGrid = new bool[towerWidth, towerHeight];
     minHeightOfDestroyedBlocks = new int[towerWidth];
 
@@ -177,14 +214,17 @@ public class DestroyBlockScript : MonoBehaviour {
       minHeightOfDestroyedBlocks[i] = 10000;
     }
 
-    checkBlock(leftOfBlock, bottomOfBlock, type);
+    for (int n = 0 ; n < numDestroyRectangles ; n++) {
+      DestroyRectangle destroyRectangle = destroyRectangles[n];
+      checkBlock(destroyRectangle.leftOfBlock, destroyRectangle.bottomOfBlock, destroyRectangle.type);
 
-    for (int i = 0 ; i < towerWidth ; i++) {
-      for (int j = 0 ; j < towerHeight ; j++) {
-        if (blockCheckGrid[i,j]) {
-          blocksToDestroy[numBlocksToDestroy] = blockGrid[i,j];
-          numBlocksToDestroy++;
-          blockGrid[i,j] = null;
+      for (int i = 0 ; i < towerWidth ; i++) {
+        for (int j = 0 ; j < towerHeight ; j++) {
+          if (blockCheckGrid[i,j] && blockGrid[i,j] != null) {
+            blocksToDestroy[numBlocksToDestroy] = blockGrid[i,j];
+            numBlocksToDestroy++;
+            blockGrid[i,j] = null;
+          }
         }
       }
     }
