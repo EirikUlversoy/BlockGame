@@ -10,12 +10,12 @@ public class DestroyBlockScript : MonoBehaviour {
 
   private BlockPairScript blockPair;
   private GameObject[,] blockGrid;
-  public GameObject[] blocksToDestroy;
+  private GameObject[] blocksToDestroy;
   private bool[,] blockCheckGrid;
-  public int[] minHeightOfDestroyedBlocks;
-  public int numBlocksToDestroy;
-  public int scoreMultiplier;
-  public int numFallingBlocks;
+  private int[] minHeightOfDestroyedBlocks;
+  private int numBlocksToDestroy;
+  private int scoreMultiplier;
+  private int numFallingBlocks;
 
   private float blockDestroySpeed = 5f;
 
