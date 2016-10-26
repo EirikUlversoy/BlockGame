@@ -21,6 +21,8 @@ public class DestroyBlockScript : MonoBehaviour {
 
   private int techBonusPointValue = 1000;
 
+  private int pointsToAdd = 0;
+
   protected class DestroyRectangle {
     public int leftOfBlock;
     public int bottomOfBlock;
@@ -216,7 +218,10 @@ public class DestroyBlockScript : MonoBehaviour {
 
     for (int n = 0 ; n < numDestroyRectangles ; n++) {
       DestroyRectangle destroyRectangle = destroyRectangles[n];
-      checkBlock(destroyRectangle.leftOfBlock, destroyRectangle.bottomOfBlock, destroyRectangle.type);
+      int pointsPerBlock = destroyRectangle.areaOfRectangle;
+      pointsToAdd += destroyRectangle.areaOfRectangle * destroyRectangle.areaOfRectangle * manager.speed;  // Destroying a rectangle gives m*n*speed where mxn are dimensions
+      Debug.Log("BLOCK BONUS: " + destroyRectangle.areaOfRectangle * destroyRectangle.areaOfRectangle * manager.speed);
+      checkBlock(destroyRectangle.leftOfBlock, destroyRectangle.bottomOfBlock, destroyRectangle.type, pointsPerBlock);
 
       for (int i = 0 ; i < towerWidth ; i++) {
         for (int j = 0 ; j < towerHeight ; j++) {
@@ -234,7 +239,9 @@ public class DestroyBlockScript : MonoBehaviour {
     if (numBlocksToDestroy == 1) { // Diamond tech
       manager.addPoints(techBonusPointValue);
     } else {
-      manager.addPoints(numBlocksToDestroy * (scoreMultiplier + 1) * manager.speed);
+      manager.addPoints(pointsToAdd * (scoreMultiplier + 1));
+      Debug.Log("Destroy rectangle gives: " + (pointsToAdd * (scoreMultiplier + 1)));
+      pointsToAdd = 0;
     }
     for (int i = 0 ; i < numBlocksToDestroy ; i++) {
       if (blocksToDestroy[i].GetComponent<DiamondScript>()) {
@@ -256,7 +263,6 @@ public class DestroyBlockScript : MonoBehaviour {
           blockGrid[i,j] = null;
           blockObject.GetComponent<BlockScript>().fallSpeedMultiplier = 10;
           blockObject.GetComponent<BlockScript>().isFalling = true;
-          // blockObject.GetComponent<BlockScript>().destroyBlock = this;
           numFallingBlocks++;
         }
       }
@@ -279,19 +285,21 @@ public class DestroyBlockScript : MonoBehaviour {
     CheckForDestroyBlocks(scoreMultiplier + 1);
   }
 
-  private void checkBlock(int i, int j, string type) {
+  private void checkBlock(int i, int j, string type, int pointsPerBlock) {
     GameObject blockObject = blockGrid[i,j];
     if (blockObject == null || blockCheckGrid[i,j] == true) {
       return;
     }
     if (blockObject.GetComponent<BlockScript>().type == type) {
+      pointsToAdd += pointsPerBlock; // each block gives points equal to m*n of destroy rectangle
+      Debug.Log(pointsPerBlock + ", " + i + ", " + j);
       blockCheckGrid[i,j] = true;
       minHeightOfDestroyedBlocks[i] = Mathf.Min(j, minHeightOfDestroyedBlocks[i]);
       if (manager.currentHeights[i] >= j) manager.currentHeights[i] = j;
-      if (i - 1 >= 0) checkBlock(i - 1, j, type);
-      if (i + 1 < towerWidth) checkBlock(i + 1, j, type);
-      if (j - 1 >= 0) checkBlock(i, j - 1, type);
-      if (j + 1 < towerHeight) checkBlock(i, j + 1, type);
+      if (i - 1 >= 0) checkBlock(i - 1, j, type, pointsPerBlock);
+      if (i + 1 < towerWidth) checkBlock(i + 1, j, type, pointsPerBlock);
+      if (j - 1 >= 0) checkBlock(i, j - 1, type, pointsPerBlock);
+      if (j + 1 < towerHeight) checkBlock(i, j + 1, type, pointsPerBlock);
     }
   }
 

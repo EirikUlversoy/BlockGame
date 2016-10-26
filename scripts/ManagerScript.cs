@@ -196,7 +196,7 @@ public class ManagerScript : MonoBehaviour {
     flashAlert("Speed Up!");
     speed++;
     updateText();
-    if (speed % 10 == 2) {  // Spawn diamond every 10 levels
+    if (speed % 10 == 0) {  // Spawn diamond every 10 levels
       blockPair.QueueDiamond();
       Debug.Log("DROP POINTS: " + debugDropPoints);
     }
