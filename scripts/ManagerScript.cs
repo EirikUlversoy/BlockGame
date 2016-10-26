@@ -191,20 +191,13 @@ public class ManagerScript : MonoBehaviour {
     flashAlert("Speed Up!");
     speed++;
     updateText();
-    if (speed % 10 == 2) {  // Spawn diamond every 10 levels
+    if (speed % 10 == 0) {  // Spawn diamond every 10 levels
       blockPair.QueueDiamond();
     }
   }
 
   public void updateText() {
     scoreText.text = "Score: " + score + "\nSpeed: " + speed;
-  }
-
-  private void createDestroyBlock(int i, int j, string type, int scoreMultiplier) {
-    // GameObject destroyBlockObject = (GameObject) Instantiate(destroyBlockPrefab, new Vector3( (2f * i + 1)/2, (2f * j + 1)/2 + 1, 0 ), Quaternion.identity);
-    // DestroyBlockScript destroyBlock = destroyBlockObject.GetComponent<DestroyBlockScript>();
-    // destroyBlock.DoDestroy(i, j, type, this, scoreMultiplier);
-
   }
 
   public void BlockDropped() {
@@ -221,32 +214,6 @@ public class ManagerScript : MonoBehaviour {
       destroyBlockScript.CheckForDestroyBlocks(scoreMultiplier);
     }
   }
-
-  public void TempCheckForDestroyBlocks(int scoreMultiplier) {
-    if (diamondTouch) {
-      CheckForDestroyBlocks(scoreMultiplier);
-      return;
-    }
-    for (int i = 0 ; i < towerWidth - 1 ; i++) {
-      for (int j = 0 ; j < towerHeight - 1 ; j++) {
-        GameObject blockObject = blockGrid[i,j];
-        if (blockObject == null) {
-          j = 100;
-          continue;
-        }
-        BlockScript blockScript = blockObject.GetComponent<BlockScript>();
-        string type = blockScript.type;
-        if (blockGrid[i+1,j] != null && blockGrid[i+1,j].GetComponent<BlockScript>().type == type &&
-            blockGrid[i,j+1] != null && blockGrid[i,j+1].GetComponent<BlockScript>().type == type &&
-            blockGrid[i+1,j+1] != null && blockGrid[i+1,j+1].GetComponent<BlockScript>().type == type) {
-          createDestroyBlock(i, j, type, scoreMultiplier);
-          return;
-        }
-      }
-    }
-    blockPair.InitializeBlockPair();
-  }
-
 
   public void AddBlockToColumn(GameObject blockObject) {
     BlockScript block = blockObject.GetComponent<BlockScript>();
