@@ -80,12 +80,12 @@ public class ManagerScript : MonoBehaviour {
     currentHeights = new int[6]{0,0,0,0,0,0};
 
     // Add start blocks to column
-    AddBlockToColumn(blockPair.SpawnBlock("earth", 1).gameObject);
-    AddBlockToColumn(blockPair.SpawnBlock("air", 2).gameObject);
-    AddBlockToColumn(blockPair.SpawnBlock("water", 3).gameObject);
-    AddBlockToColumn(blockPair.SpawnBlock("fire", 4).gameObject);
+    // AddBlockToColumn(blockPair.SpawnBlock("earth", 1).gameObject);
+    // AddBlockToColumn(blockPair.SpawnBlock("air", 2).gameObject);
+    // AddBlockToColumn(blockPair.SpawnBlock("water", 3).gameObject);
+    // AddBlockToColumn(blockPair.SpawnBlock("fire", 4).gameObject);
 
-    // initialize block pair
+    // // initialize block pair
     blockPair.isActive = true;
     blockPair.gameOver = false;
     blockPair.InitializePreviewBlocks();
@@ -196,7 +196,7 @@ public class ManagerScript : MonoBehaviour {
     flashAlert("Speed Up!");
     speed++;
     updateText();
-    if (speed % 10 == 0) {  // Spawn diamond every 10 levels
+    if (speed % 10 == 2) {  // Spawn diamond every 10 levels
       blockPair.QueueDiamond();
       Debug.Log("DROP POINTS: " + debugDropPoints);
     }
@@ -221,8 +221,8 @@ public class ManagerScript : MonoBehaviour {
 
   public void CheckForDestroyBlocks(int scoreMultiplier) {
     // Each drop, add points equal to number of blocks on the board
-    addPoints(getNumberOfBlocksOnBoard());
-    debugDropPoints += getNumberOfBlocksOnBoard();
+    // addPoints(getNumberOfBlocksOnBoard());
+    // debugDropPoints += getNumberOfBlocksOnBoard();
     if (diamondTouch) {
       destroyBlockScript.DoDiamondDestroy(diamondTouchColor, scoreMultiplier);
       diamondTouch = false;
@@ -245,7 +245,7 @@ public class ManagerScript : MonoBehaviour {
     block.isFalling = false;
     int column = block.column;
     currentHeights[column]++;
-    if (currentHeights[column] > towerHeight) {
+    if (currentHeights[column] > towerHeight) {  // TODO: ADJUST THIS SOMEHOW
       doGameOver();
       Destroy(blockObject);
     } else {
