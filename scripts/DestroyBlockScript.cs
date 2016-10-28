@@ -21,9 +21,12 @@ public class DestroyBlockScript : MonoBehaviour {
 
   private float blockDestroySpeed = 5f;
 
-  private int techBonusPointValue = 1000;
+  private int techBonusPointValue = 10;
 
   private int pointsToAdd = 0;
+
+  public int debugPointsFromBlocks = 0;
+  public int debugPointsFromDestroyedBlocks = 0;
 
   public void Initialize(ManagerScript setManager, BlockPairScript setBlockPair, int width, int height) {
     manager = setManager;
@@ -39,6 +42,8 @@ public class DestroyBlockScript : MonoBehaviour {
     numBlocksToDestroy = 0;
     pointsGrid = new int[towerWidth, towerHeight];  // All values should initialize to zero
 
+    Debug.Log("Points from squares: " + debugPointsFromBlocks);
+    Debug.Log("Points from destroys: " + debugPointsFromDestroyedBlocks);
 
     minHeightOfDestroyedBlocks = new int[towerWidth];
     for (int i = 0 ; i < minHeightOfDestroyedBlocks.Length ; i ++) {
@@ -47,13 +52,14 @@ public class DestroyBlockScript : MonoBehaviour {
 
     if (type == "") { // Tech bonus
       for (int i = 0 ; i < towerWidth ; i++) {
-        if (blockGrid[i,0].GetComponent<BlockScript>().type == "diamond") {
+        if (blockGrid[i,0] != null && blockGrid[i,0].GetComponent<BlockScript>().type == "diamond") {
           manager.currentHeights[i] = 0;
           minHeightOfDestroyedBlocks[i] = 0;
           blocksToDestroy[numBlocksToDestroy] = blockGrid[i,0];
           numBlocksToDestroy++;
           blockGrid[i,0] = null;
-          pointsGrid[i,0] = techBonusPointValue;
+          pointsGrid[i,0] = techBonusPointValue * manager.speed;
+          pointsToAdd += techBonusPointValue * manager.speed;
           return;
         }
       }
@@ -68,6 +74,7 @@ public class DestroyBlockScript : MonoBehaviour {
           blocksToDestroy[numBlocksToDestroy] = blockGrid[i,j];
           numBlocksToDestroy++;
           pointsGrid[i,j] += numBlocksToDestroy;
+          pointsToAdd += numBlocksToDestroy;
           blockGrid[i,j] = null;
         }
       }
@@ -112,8 +119,9 @@ public class DestroyBlockScript : MonoBehaviour {
     if (numDestroySquares == 0) {
       blockPair.InitializeBlockPair();
     } else {
-      Debug.Log("BLOCK BONUS: " + numDestroySquares * numDestroySquares * manager.speed);
-      manager.addPoints(numDestroySquares * numDestroySquares * manager.speed);
+      Debug.Log("BLOCK BONUS: " + numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed);
+      manager.addPoints(numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed);
+      debugPointsFromBlocks += numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed;
       startBlockDestroy(destroySquares);
     }
   }
@@ -145,6 +153,7 @@ public class DestroyBlockScript : MonoBehaviour {
   }
 
   private void startBlockDestroy(Queue<int[]> destroySquares) {
+    Debug.Log("START BLOCK DESTROY");
     blocksToDestroy = new GameObject[(towerHeight - 1) * (towerWidth - 1)];
     numBlocksToDestroy = 0;
     minHeightOfDestroyedBlocks = new int[towerWidth];
@@ -175,8 +184,9 @@ public class DestroyBlockScript : MonoBehaviour {
     if (numBlocksToDestroy == 1) { // Diamond tech
       manager.addPoints(techBonusPointValue);
     } else {
-      manager.addPoints(pointsToAdd * (scoreMultiplier + 1));
-      Debug.Log("Destroy rectangle gives: " + (pointsToAdd * (scoreMultiplier + 1)));
+      manager.addPoints(pointsToAdd * scoreMultiplier);
+      Debug.Log("Destroy rectangle gives: " + (pointsToAdd * scoreMultiplier));
+      debugPointsFromDestroyedBlocks += pointsToAdd * scoreMultiplier;
       pointsToAdd = 0;
     }
     for (int i = 0 ; i < numBlocksToDestroy ; i++) {

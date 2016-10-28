@@ -38,7 +38,7 @@ public class ManagerScript : MonoBehaviour {
 
 
   // REMOVE THESE
-  private int debugDropPoints = 0;
+  public int debugDropPoints = 0;
 
 	// Use this for initialization
 	void Awake () {
@@ -196,7 +196,7 @@ public class ManagerScript : MonoBehaviour {
     flashAlert("Speed Up!");
     speed++;
     updateText();
-    if (speed % 10 == 2) {  // Spawn diamond every 10 levels
+    if (speed % 10 == 0) {  // Spawn diamond every 10 levels
       blockPair.QueueDiamond();
       Debug.Log("DROP POINTS: " + debugDropPoints);
     }
@@ -211,18 +211,10 @@ public class ManagerScript : MonoBehaviour {
     if (numBlocksDropped % 10 == 0) increaseSpeed();
   }
 
-  private int getNumberOfBlocksOnBoard() {
-    int numBlocks = 0;
-    for (int i = 0 ; i < currentHeights.Length ; i++) {
-      numBlocks += currentHeights[i];
-    }
-    return numBlocks;
-  }
-
   public void CheckForDestroyBlocks(int scoreMultiplier) {
     // Each drop, add points equal to number of blocks on the board
-    // addPoints(getNumberOfBlocksOnBoard());
-    // debugDropPoints += getNumberOfBlocksOnBoard();
+    addPoints(speed);
+    debugDropPoints += speed;
     if (diamondTouch) {
       destroyBlockScript.DoDiamondDestroy(diamondTouchColor, scoreMultiplier);
       diamondTouch = false;

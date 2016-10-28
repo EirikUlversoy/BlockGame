@@ -302,7 +302,7 @@ public class BlockPairScript : MonoBehaviour {
       if (leftBlock == null && rightBlock == null) {
         isActive = false;
         manager.BlockDropped();
-        manager.CheckForDestroyBlocks(0);
+        manager.CheckForDestroyBlocks(1);
       }
       checkInputs();
     }
