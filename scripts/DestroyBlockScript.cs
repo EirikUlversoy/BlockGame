@@ -22,6 +22,7 @@ public class DestroyBlockScript : MonoBehaviour {
   private float blockDestroySpeed = 5f;
 
   private int techBonusPointValue = 10;
+  private int allClearPointBonus = 20;
 
   private int pointsToAdd = 0;
 
@@ -41,9 +42,6 @@ public class DestroyBlockScript : MonoBehaviour {
     blocksToDestroy = new GameObject[towerHeight * towerWidth];
     numBlocksToDestroy = 0;
     pointsGrid = new int[towerWidth, towerHeight];  // All values should initialize to zero
-
-    Debug.Log("Points from squares: " + debugPointsFromBlocks);
-    Debug.Log("Points from destroys: " + debugPointsFromDestroyedBlocks);
 
     minHeightOfDestroyedBlocks = new int[towerWidth];
     for (int i = 0 ; i < minHeightOfDestroyedBlocks.Length ; i ++) {
@@ -153,7 +151,6 @@ public class DestroyBlockScript : MonoBehaviour {
   }
 
   private void startBlockDestroy(Queue<int[]> destroySquares) {
-    Debug.Log("START BLOCK DESTROY");
     blocksToDestroy = new GameObject[(towerHeight - 1) * (towerWidth - 1)];
     numBlocksToDestroy = 0;
     minHeightOfDestroyedBlocks = new int[towerWidth];
@@ -228,7 +225,19 @@ public class DestroyBlockScript : MonoBehaviour {
   }
 
   private void finishDestroy() {
-    CheckForDestroyBlocks(scoreMultiplier + 1);
+    bool fieldEmpty = true;
+    for (int i = 0 ; i < towerWidth ; i++) {
+      if (blockGrid[i, 0] != null) {
+        fieldEmpty = false;
+        break;
+      }
+    }
+    if (fieldEmpty) {
+        manager.addPoints(manager.speed * allClearPointBonus);
+      manager.flashAlert("All Clear");
+    } else {
+      CheckForDestroyBlocks(scoreMultiplier + 1);
+    }
   }
 
   private void checkBlock(int i, int j, string type, bool[,] blockCheckGrid) {

@@ -35,10 +35,10 @@ public class ManagerScript : MonoBehaviour {
 
   private DestroyBlockScript destroyBlockScript;
 
-
-
   // REMOVE THESE
   public int debugDropPoints = 0;
+  public int[] debugPointsPerLevel;
+
 
 	// Use this for initialization
 	void Awake () {
@@ -56,6 +56,8 @@ public class ManagerScript : MonoBehaviour {
     initializeAlertText();
 
     flashPermanentAlert("PRESS ENTER TO BEGIN");
+
+    debugPointsPerLevel = new int[100];
 	}
 
   private void startNewGame() {
@@ -191,6 +193,7 @@ public class ManagerScript : MonoBehaviour {
   public void addPoints(int amount) {
     score += amount;
     updateText();
+    debugPointsPerLevel[speed] += amount;
   }
   public void increaseSpeed () {
     flashAlert("Speed Up!");
@@ -198,7 +201,6 @@ public class ManagerScript : MonoBehaviour {
     updateText();
     if (speed % 10 == 0) {  // Spawn diamond every 10 levels
       blockPair.QueueDiamond();
-      Debug.Log("DROP POINTS: " + debugDropPoints);
     }
   }
 
@@ -251,8 +253,7 @@ public class ManagerScript : MonoBehaviour {
     gameOver = true;
     blockPair.isActive = false;
     blockPair.gameOver = true;
-    // flashPermanentAlert("GAME OVER\n\nPRESS ENTER TO BEGIN");
-    flashPermanentAlert("GAME OVER\n\nPRESS ENTER TO BEGIN\n" + debugDropPoints);
+    flashPermanentAlert("GAME OVER\n\nPRESS ENTER TO BEGIN");
   }
 
   void Update() {
