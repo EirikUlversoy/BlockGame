@@ -222,6 +222,9 @@ public class BlockPairScript : MonoBehaviour {
       rightBlock.AddBlockToColumn();
       leftBlock.AddBlockToColumn();
     }
+      // Each drop, add points equal to number of blocks on the board
+    manager.addPoints(manager.speed);
+    manager.debugDropPoints += manager.speed;
   }
 
   // Positive direction is CCW, negative is CW

@@ -214,9 +214,6 @@ public class ManagerScript : MonoBehaviour {
   }
 
   public void CheckForDestroyBlocks(int scoreMultiplier) {
-    // Each drop, add points equal to number of blocks on the board
-    addPoints(speed);
-    debugDropPoints += speed;
     if (diamondTouch) {
       destroyBlockScript.DoDiamondDestroy(diamondTouchColor, scoreMultiplier);
       diamondTouch = false;
