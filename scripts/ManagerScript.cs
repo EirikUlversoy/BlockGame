@@ -267,8 +267,14 @@ public class ManagerScript : MonoBehaviour {
   }
 
   void LateUpdate() {
-    if (gameOver && (Input.GetKeyDown( KeyCode.Return ) || Input.GetKeyDown( KeyCode.KeypadEnter ))) {
-      startNewGame();
+    if (gameOver) {
+      if (Input.GetKeyDown( KeyCode.Return ) || Input.GetKeyDown( KeyCode.KeypadEnter )) {
+        audioManager.shouldPlayAudio = true;
+        startNewGame();
+      } else if (Input.GetKeyDown( KeyCode.M )) {
+        audioManager.shouldPlayAudio = false;
+        startNewGame();
+      }
     }
   }
 

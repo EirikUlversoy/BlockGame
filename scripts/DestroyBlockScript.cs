@@ -117,9 +117,9 @@ public class DestroyBlockScript : MonoBehaviour {
     if (numDestroySquares == 0) {
       blockPair.InitializeBlockPair();
     } else {
-      Debug.Log("BLOCK BONUS: " + numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed);
-      manager.addPoints(numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed);
-      debugPointsFromBlocks += numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed;
+      Debug.Log("BLOCK BONUS: " + numDestroySquares * numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed);
+      manager.addPoints(numDestroySquares * numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed);
+      debugPointsFromBlocks += numDestroySquares * numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed;
       startBlockDestroy(destroySquares);
     }
   }

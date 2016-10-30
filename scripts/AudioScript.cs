@@ -11,6 +11,8 @@ public class AudioScript : MonoBehaviour {
   private float clipLength = 24;
   private bool isPlaying = false;
 
+  public bool shouldPlayAudio = true;
+
   void Awake() {
     gameObject.name = "AudioManager";
     AudioClip audio0 = Resources.Load<AudioClip>("Audio/KeyboardHarmony");
@@ -25,6 +27,7 @@ public class AudioScript : MonoBehaviour {
   }
 
   public void PlayAudio() {
+    if (!shouldPlayAudio) return;
     for (int i = 0 ; i < audioSources.Length ; i++) {
       if (layersActive - 1 >= i) {
         audioSources[i].Play();
