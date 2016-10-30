@@ -35,6 +35,8 @@ public class ManagerScript : MonoBehaviour {
 
   private DestroyBlockScript destroyBlockScript;
 
+  private AudioScript audioManager;
+
   // REMOVE THESE
   public int debugDropPoints = 0;
   public int[] debugPointsPerLevel;
@@ -44,6 +46,7 @@ public class ManagerScript : MonoBehaviour {
 	void Awake () {
     blockGrid = new GameObject[towerWidth,towerHeight];
     currentHeights = new int[6]{0,0,0,0,0,0};
+    audioManager = new GameObject().AddComponent<AudioScript>();
 
     initializeBlockWell();
 
@@ -94,6 +97,8 @@ public class ManagerScript : MonoBehaviour {
     blockPair.InitializeBlockPair();
 
     flashPermanentAlert("");
+
+    audioManager.PlayAudio();
 
   }
 
