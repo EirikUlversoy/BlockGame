@@ -131,6 +131,7 @@ public class ManagerScript : MonoBehaviour {
   private void initializeDestroyBlock() {
     destroyBlockScript = gameObject.AddComponent<DestroyBlockScript>();
     destroyBlockScript.Initialize(this, blockPair, towerWidth, towerHeight);
+    destroyBlockScript.audioManager = audioManager;
   }
 
   private void initializeBlockPair() {
@@ -139,6 +140,7 @@ public class ManagerScript : MonoBehaviour {
     blockPair.towerHeight = towerHeight;
     blockPair.towerWidth = towerWidth;
     blockPair.manager = this;
+    blockPair.audioManager = audioManager;
   }
 
   void initializeScoreText () {

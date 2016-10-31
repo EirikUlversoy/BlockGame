@@ -30,6 +30,8 @@ public class BlockPairScript : MonoBehaviour {
 
   private bool queueDiamond = false;
 
+  public AudioScript audioManager;
+
 
   void Awake() {
     initializeBlockInstance();
@@ -225,6 +227,7 @@ public class BlockPairScript : MonoBehaviour {
       // Each drop, add points equal to number of blocks on the board
     manager.addPoints(manager.speed);
     manager.debugDropPoints += manager.speed;
+    audioManager.PlayBlockSound("DROP");
   }
 
   // Positive direction is CCW, negative is CW

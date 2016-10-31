@@ -29,6 +29,8 @@ public class DestroyBlockScript : MonoBehaviour {
   public int debugPointsFromBlocks = 0;
   public int debugPointsFromDestroyedBlocks = 0;
 
+  public AudioScript audioManager;
+
   public void Initialize(ManagerScript setManager, BlockPairScript setBlockPair, int width, int height) {
     manager = setManager;
     towerWidth = width;
@@ -42,6 +44,8 @@ public class DestroyBlockScript : MonoBehaviour {
     blocksToDestroy = new GameObject[towerHeight * towerWidth];
     numBlocksToDestroy = 0;
     pointsGrid = new int[towerWidth, towerHeight];  // All values should initialize to zero
+
+    audioManager.PlayBlockSound("DIAMOND");
 
     minHeightOfDestroyedBlocks = new int[towerWidth];
     for (int i = 0 ; i < minHeightOfDestroyedBlocks.Length ; i ++) {
@@ -117,6 +121,8 @@ public class DestroyBlockScript : MonoBehaviour {
     if (numDestroySquares == 0) {
       blockPair.InitializeBlockPair();
     } else {
+      audioManager.PlayBlockSound("BREAK");
+
       Debug.Log("BLOCK BONUS: " + numDestroySquares * numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed);
       manager.addPoints(numDestroySquares * numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed);
       debugPointsFromBlocks += numDestroySquares * numDestroySquares * numDestroySquares * scoreMultiplier * manager.speed;
@@ -211,7 +217,11 @@ public class DestroyBlockScript : MonoBehaviour {
       }
     }
 
-    if (numFallingBlocks <= 0) finishDestroy();
+    if (numFallingBlocks <= 0) {
+      finishDestroy();
+    } else {
+      audioManager.PlayBlockSound("FALL");
+    }
 
   }
 
@@ -233,11 +243,10 @@ public class DestroyBlockScript : MonoBehaviour {
       }
     }
     if (fieldEmpty) {
-        manager.addPoints(manager.speed * allClearPointBonus);
+      manager.addPoints(manager.speed * allClearPointBonus);
       manager.flashAlert("All Clear");
-    } else {
-      CheckForDestroyBlocks(scoreMultiplier + 1);
     }
+    CheckForDestroyBlocks(scoreMultiplier + 1);
   }
 
   private void checkBlock(int i, int j, string type, bool[,] blockCheckGrid) {
