@@ -228,6 +228,7 @@ public class BlockPairScript : MonoBehaviour {
     manager.addPoints(manager.speed);
     manager.debugDropPoints += manager.speed;
     audioManager.PlayBlockSound("DROP");
+    audioManager.RecordDrop();
   }
 
   // Positive direction is CCW, negative is CW

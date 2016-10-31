@@ -205,6 +205,7 @@ public class ManagerScript : MonoBehaviour {
   public void increaseSpeed () {
     flashAlert("Speed Up!");
     speed++;
+    audioManager.gameSpeed = speed;
     updateText();
     if (speed % 10 == 0) {  // Spawn diamond every 10 levels
       blockPair.QueueDiamond();
@@ -271,9 +272,11 @@ public class ManagerScript : MonoBehaviour {
   void LateUpdate() {
     if (gameOver) {
       if (Input.GetKeyDown( KeyCode.Return ) || Input.GetKeyDown( KeyCode.KeypadEnter )) {
+        audioManager.RestartAudio();
         audioManager.shouldPlayAudio = true;
         startNewGame();
       } else if (Input.GetKeyDown( KeyCode.M )) {
+        audioManager.RestartAudio();
         audioManager.shouldPlayAudio = false;
         startNewGame();
       }
