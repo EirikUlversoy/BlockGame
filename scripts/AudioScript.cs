@@ -68,6 +68,7 @@ public class AudioScript : MonoBehaviour {
 
   public void RestartAudio() {
     isPlaying = false;
+    layersActive = 0;
     clipsPlayed = 0;
     playTime = 0;
     StopAudio();

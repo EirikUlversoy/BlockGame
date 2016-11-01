@@ -37,6 +37,8 @@ public class ManagerScript : MonoBehaviour {
 
   private AudioScript audioManager;
 
+  private HighScoreScript highScoreManager;
+
   // REMOVE THESE
   public int debugDropPoints = 0;
   public int[] debugPointsPerLevel;
@@ -47,6 +49,8 @@ public class ManagerScript : MonoBehaviour {
     blockGrid = new GameObject[towerWidth,towerHeight];
     currentHeights = new int[6]{0,0,0,0,0,0};
     audioManager = new GameObject().AddComponent<AudioScript>();
+
+    highScoreManager = gameObject.AddComponent<HighScoreScript>();
 
     initializeBlockWell();
 
@@ -61,6 +65,7 @@ public class ManagerScript : MonoBehaviour {
     flashPermanentAlert("PRESS ENTER TO BEGIN");
 
     debugPointsPerLevel = new int[100];
+
 	}
 
   private void startNewGame() {
@@ -266,7 +271,6 @@ public class ManagerScript : MonoBehaviour {
       alertText.color = new Color(1,1,1,alertFlashTime);
       alertFlashTime -= Time.deltaTime;
     }
-
   }
 
   void LateUpdate() {
