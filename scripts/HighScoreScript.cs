@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 using SimpleJSON;
@@ -15,10 +17,60 @@ public class HighScoreScript : MonoBehaviour {
   private int debugScore = 100;
   private int debugSpeed = 5;
 
+  private GameObject highScoreField;
+
   void Start() {
     waitingForWWW = true;
+    initializeHighScoreScreen();
+    ShowHighScoreScreen();
     // StartCoroutine(GetHighScores());
-    StartCoroutine(SubmitHighScore());
+    // StartCoroutine(SubmitHighScore());
+  }
+
+  private void initializeHighScoreScreen() {
+    GameObject newCanvas = new GameObject("Canvas");
+    Canvas c = newCanvas.AddComponent<Canvas>();
+    // newCanvas.AddComponent<GraphicRaycaster>();
+    c.renderMode = RenderMode.ScreenSpaceOverlay;
+    newCanvas.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+
+    EventSystem eventSystem = new GameObject().AddComponent<EventSystem>();
+    eventSystem.gameObject.name = "Event System";
+    eventSystem.gameObject.AddComponent<StandaloneInputModule>();
+
+    highScoreField = new GameObject("HighScoreNameInput");
+    highScoreField.AddComponent<RectTransform>();
+    highScoreField.AddComponent<CanvasRenderer>();
+    InputField inputField = highScoreField.AddComponent<InputField>();
+    highScoreField.transform.SetParent(newCanvas.transform, false);
+    GameObject highScoreFieldText = new GameObject("HighScoreFieldText");
+    highScoreFieldText.transform.SetParent(highScoreField.transform, false);
+    Text scoreText = highScoreFieldText.AddComponent<Text>();
+    scoreText.text = "TEST";
+    inputField.textComponent = scoreText;
+    scoreText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+    scoreText.fontSize = 24;
+
+
+    inputField.ActivateInputField();
+    // eventSystem.SetSelectedGameObject(inputField.gameObject, null);
+    // inputField.OnPointerClick (new PointerEventData(eventSystem));
+
+
+
+    // scoreText.rectTransform.anchoredPosition = new Vector2(0,30);
+    // scoreText.rectTransform.sizeDelta = new Vector2(200,30);
+    // scoreText.transform.SetParent(newCanvas.transform, false);
+    // scoreText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+    // scoreText.fontSize = 36;
+    // scoreText.color = Color.white;
+    // scoreText.fontStyle = FontStyle.Bold;
+    // scoreText.alignment = TextAnchor.UpperLeft;
+    // scoreTextObject.AddComponent<Shadow>().effectColor = Color.black;
+  }
+
+  public void ShowHighScoreScreen() {
+
   }
 
   // curl -H "Content-Type: application/json" -X POST -d '{"user":{"email":"bradyfukumoto@gmail.com","password":"[PASSWORD]"}}' https://www.bradyfukumoto.com/api/v1/sessions
