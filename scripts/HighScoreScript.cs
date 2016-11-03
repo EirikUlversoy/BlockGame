@@ -7,8 +7,8 @@ using SimpleJSON;
 
 public class HighScoreScript : MonoBehaviour {
 
-  private string hostname = "localhost:3000";
-  // private string hostname = "https://www.bradyfukumoto.com";
+  // private string hostname = "localhost:3000";
+  private string hostname = "https://www.bradyfukumoto.com";
 
   private ManagerScript manager;
 
@@ -170,7 +170,7 @@ public class HighScoreScript : MonoBehaviour {
 
   void Update() {
     if (inputFieldShouldBeActive && (Input.GetKeyDown( KeyCode.Return ) || Input.GetKeyDown( KeyCode.KeypadEnter )) ) {
-      if (highScoreFieldText.text.Trim().Length >= 0) {
+      if (highScoreFieldText.text.Trim().Length > 0) {
         playerName = highScoreFieldText.text.Trim();
         StartCoroutine(SubmitHighScore());
       }
