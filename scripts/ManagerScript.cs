@@ -14,15 +14,14 @@ public class ManagerScript : MonoBehaviour {
   private GameObject wall_right;
   private GameObject ground;
   private GameObject background;
+  private GameObject backgroundPanel;
 
   private BlockPairScript blockPair;
 
   public int score = 0;
   public int speed = 1;
-  public GameObject scoreTextObject;
   public Text scoreText;
 
-  public GameObject alertTextObject;
   public Text alertText;
   private float alertFlashTime = 0;
 
@@ -32,6 +31,8 @@ public class ManagerScript : MonoBehaviour {
   private string diamondTouchColor = "";
 
   private bool gameOver = true;
+  private bool doneWithHighScores = false;
+  private bool readyToStart = true;
 
   private DestroyBlockScript destroyBlockScript;
 
@@ -62,7 +63,7 @@ public class ManagerScript : MonoBehaviour {
 
     initializeAlertText();
 
-    flashPermanentAlert("PRESS ENTER TO BEGIN");
+    flashPermanentAlert("Press ENTER to begin");
 
     debugPointsPerLevel = new int[100];
 
@@ -73,6 +74,8 @@ public class ManagerScript : MonoBehaviour {
     gameOver = false;
     speed = 1;
     score = 0;
+    backgroundPanel.SetActive(false);
+    highScoreManager.HideHighScoreScreen();
     updateText();
 
     // Destroy all blocks
@@ -116,21 +119,27 @@ public class ManagerScript : MonoBehaviour {
     wall_right = (GameObject) Instantiate(wall_left, new Vector3(6, 7, 0), Quaternion.identity);
     ground = (GameObject) Instantiate(wall_left, new Vector3(2.5f, 0, 0), Quaternion.identity);
     background = (GameObject) Instantiate(wall_left, new Vector3(2.5f, 7, 1), Quaternion.identity);
+    backgroundPanel = (GameObject) Instantiate(wall_left, new Vector3(2.5f, 7, -5), Quaternion.identity);
 
     wall_left.transform.localScale = new Vector3(1,13,1);
     wall_right.transform.localScale = new Vector3(1,13,1);
     ground.transform.localScale = new Vector3(8,1,1);
     background.transform.localScale = new Vector3(20,15,1);
+    backgroundPanel.transform.localScale = new Vector3(20,15,1);
 
     wall_left.name = "Wall_Left";
     wall_right.name = "Wall_Right";
     ground.name = "Ground";
     background.name = "Background";
+    backgroundPanel.name = "Background Panel";
 
     wall_left.GetComponent<MeshRenderer>().material.color = Color.black;
     wall_right.GetComponent<MeshRenderer>().material.color = Color.black;
     ground.GetComponent<MeshRenderer>().material.color = Color.black;
     background.GetComponent<MeshRenderer>().material.color = Color.grey;
+    backgroundPanel.GetComponent<MeshRenderer>().material.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+
+    backgroundPanel.SetActive(false);
   }
 
   private void initializeDestroyBlock() {
@@ -154,7 +163,7 @@ public class ManagerScript : MonoBehaviour {
     c.renderMode = RenderMode.ScreenSpaceOverlay;
     newCanvas.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 
-    scoreTextObject = new GameObject("scoreText");
+    GameObject scoreTextObject = new GameObject("scoreText");
     scoreTextObject.AddComponent<CanvasRenderer>();
     scoreText = scoreTextObject.AddComponent<Text>();
     scoreText.rectTransform.anchoredPosition = new Vector2(-80,200);
@@ -175,7 +184,7 @@ public class ManagerScript : MonoBehaviour {
     c.renderMode = RenderMode.ScreenSpaceOverlay;
     newCanvas.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 
-    alertTextObject = new GameObject("alertText");
+    GameObject alertTextObject = new GameObject("alertText");
     alertTextObject.AddComponent<CanvasRenderer>();
     alertText = alertTextObject.AddComponent<Text>();
     alertText.rectTransform.anchoredPosition = new Vector2(280,0);
@@ -183,10 +192,10 @@ public class ManagerScript : MonoBehaviour {
     alertText.text = "ALERT";
     alertText.transform.SetParent(newCanvas.transform, false);
     alertText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-    alertText.fontSize = 36;
+    alertText.fontSize = 30;
     alertText.color = new Color(1,1,1,0);
     alertText.fontStyle = FontStyle.Bold;
-    alertText.alignment = TextAnchor.MiddleLeft;
+    alertText.alignment = TextAnchor.MiddleCenter;
     alertTextObject.AddComponent<Shadow>().effectColor = Color.black;
   }
 
@@ -263,7 +272,22 @@ public class ManagerScript : MonoBehaviour {
     gameOver = true;
     blockPair.isActive = false;
     blockPair.gameOver = true;
-    flashPermanentAlert("GAME OVER\n\nPRESS ENTER TO BEGIN");
+    backgroundPanel.SetActive(true);
+
+    if (score > 10) {
+      highScoreManager.ShowHighScoreScreen(score, speed, true);
+      doneWithHighScores = false;
+      readyToStart = false;
+      flashPermanentAlert("GAME OVER\n~\nGreat score!\n\nType your name and press ENTER to submit");
+    } else {
+      highScoreManager.ShowHighScoreScreen(score, speed, false);
+      readyToStart = true;
+      flashPermanentAlert("GAME OVER\n\nPress ENTER to begin");
+    }
+  }
+
+  public void DoneWithHighScores() {
+    doneWithHighScores = true;
   }
 
   void Update() {
@@ -275,14 +299,18 @@ public class ManagerScript : MonoBehaviour {
 
   void LateUpdate() {
     if (gameOver) {
-      if (Input.GetKeyDown( KeyCode.Return ) || Input.GetKeyDown( KeyCode.KeypadEnter )) {
-        audioManager.RestartAudio();
-        audioManager.shouldPlayAudio = true;
-        startNewGame();
-      } else if (Input.GetKeyDown( KeyCode.M )) {
-        audioManager.RestartAudio();
-        audioManager.shouldPlayAudio = false;
-        startNewGame();
+      if (readyToStart) {
+        if (Input.GetKeyDown( KeyCode.Return ) || Input.GetKeyDown( KeyCode.KeypadEnter )) {
+          audioManager.RestartAudio();
+          audioManager.shouldPlayAudio = true;
+          startNewGame();
+        } else if (Input.GetKeyDown( KeyCode.M )) {
+          audioManager.RestartAudio();
+          audioManager.shouldPlayAudio = false;
+          startNewGame();
+        }
+      } else if (doneWithHighScores) {
+        readyToStart = true;
       }
     }
   }
