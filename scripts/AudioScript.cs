@@ -176,7 +176,7 @@ public class AudioScript : MonoBehaviour {
       if (playTime >= clipLength) {
         clipsPlayed++;
         if (clipsPlayed % 4 == 0 && !isGameOver) {
-          // layersActive++;
+          layersActive++;
           layersActive = Mathf.Min(layersActive + 1, gameSpeed / 3);
           Debug.Log("DROPS: " + numDrops);
           numDrops = 0;
