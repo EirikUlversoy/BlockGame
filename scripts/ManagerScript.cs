@@ -76,6 +76,7 @@ public class ManagerScript : MonoBehaviour {
     score = 0;
     backgroundPanel.SetActive(false);
     highScoreManager.HideHighScoreScreen();
+    audioManager.SetGameOver(false);
     updateText();
 
     // Destroy all blocks
@@ -284,6 +285,8 @@ public class ManagerScript : MonoBehaviour {
       readyToStart = true;
       flashPermanentAlert("GAME OVER\n\nPress ENTER to begin");
     }
+
+    audioManager.SetGameOver(true);
   }
 
   public void DoneWithHighScores() {

@@ -12,6 +12,7 @@ public class AudioScript : MonoBehaviour {
   private float clipLength = 8;
   private int clipsPlayed = 0;
   private bool isPlaying = false;
+  private bool isGameOver = true;
 
   private int numDrops = 0;
 
@@ -128,6 +129,8 @@ public class AudioScript : MonoBehaviour {
       }
       audioSources[0].Play();
     }
+
+    // Heartbeat
     if (gameSpeed >= 30) {
       audioSources[1].clip = basspp;
       audioSources[1].Play();
@@ -160,12 +163,19 @@ public class AudioScript : MonoBehaviour {
     return audioSource;
   }
 
+  public void SetGameOver(bool shouldBeGameOver) {
+    isGameOver = shouldBeGameOver;
+    if (isGameOver) {
+      layersActive = Mathf.Min(5, layersActive);
+    }
+  }
+
   void Update() {
     if (isPlaying) {
       playTime += Time.deltaTime;
       if (playTime >= clipLength) {
         clipsPlayed++;
-        if (clipsPlayed % 4 == 0) {
+        if (clipsPlayed % 4 == 0 && !isGameOver) {
           // layersActive++;
           layersActive = Mathf.Min(layersActive + 1, gameSpeed / 3);
           Debug.Log("DROPS: " + numDrops);
