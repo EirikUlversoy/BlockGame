@@ -177,8 +177,10 @@ public class BlockPairScript : MonoBehaviour {
     // }
     if (Input.GetKeyDown( KeyCode.W ) || Input.GetKeyDown( KeyCode.UpArrow)) {
       tryFullDrop();
+      // tryRotate(1);
     }
     if (Input.GetKeyDown( KeyCode.Q ) || Input.GetKeyDown( KeyCode.Space)) {
+      // tryFullDrop();
       tryRotate(1);
     }
     if (Input.GetKeyDown( KeyCode.E ) || Input.GetKeyDown( KeyCode.LeftShift) || Input.GetKeyDown( KeyCode.RightShift)) {
