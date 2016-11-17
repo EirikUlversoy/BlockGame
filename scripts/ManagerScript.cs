@@ -306,10 +306,17 @@ public class ManagerScript : MonoBehaviour {
         if (Input.GetKeyDown( KeyCode.Return ) || Input.GetKeyDown( KeyCode.KeypadEnter )) {
           audioManager.RestartAudio();
           audioManager.shouldPlayAudio = true;
+          blockPair.controls_standard = true;
+          startNewGame();
+        } else if (Input.GetKeyDown( KeyCode.N )) {
+          audioManager.RestartAudio();
+          audioManager.shouldPlayAudio = true;
+          blockPair.controls_standard = false;
           startNewGame();
         } else if (Input.GetKeyDown( KeyCode.M )) {
           audioManager.RestartAudio();
           audioManager.shouldPlayAudio = false;
+          blockPair.controls_standard = true;
           startNewGame();
         }
       } else if (doneWithHighScores) {

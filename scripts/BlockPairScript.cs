@@ -32,6 +32,8 @@ public class BlockPairScript : MonoBehaviour {
 
   public AudioScript audioManager;
 
+  public bool controls_standard = true;
+
 
   void Awake() {
     initializeBlockInstance();
@@ -176,12 +178,18 @@ public class BlockPairScript : MonoBehaviour {
     //   tryDrop(1);
     // }
     if (Input.GetKeyDown( KeyCode.W ) || Input.GetKeyDown( KeyCode.UpArrow)) {
-      tryFullDrop();
-      // tryRotate(1);
+      if (controls_standard) {
+        tryFullDrop();
+      } else {
+        tryRotate(1);
+      }
     }
     if (Input.GetKeyDown( KeyCode.Q ) || Input.GetKeyDown( KeyCode.Space)) {
-      // tryFullDrop();
-      tryRotate(1);
+      if (controls_standard) {
+        tryRotate(1);
+      } else {
+        tryFullDrop();
+      }
     }
     if (Input.GetKeyDown( KeyCode.E ) || Input.GetKeyDown( KeyCode.LeftShift) || Input.GetKeyDown( KeyCode.RightShift)) {
       tryRotate(-1);
