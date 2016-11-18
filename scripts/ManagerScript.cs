@@ -51,6 +51,10 @@ public class ManagerScript : MonoBehaviour {
     currentHeights = new int[6]{0,0,0,0,0,0};
     audioManager = new GameObject().AddComponent<AudioScript>();
 
+    Camera.main.transform.position = new Vector3(2.5f, 7f, -10f);
+    Camera.main.orthographic = true;
+    Camera.main.orthographicSize = 7.5f;
+
     highScoreManager = gameObject.AddComponent<HighScoreScript>();
 
     initializeBlockWell();

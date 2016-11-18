@@ -6,5 +6,6 @@
 
 /plugins
 /tmp
+*.meta
 compile_scripts.sh
 BlockGame.sublime*
