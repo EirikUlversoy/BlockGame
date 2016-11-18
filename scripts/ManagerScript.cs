@@ -67,7 +67,7 @@ public class ManagerScript : MonoBehaviour {
 
     initializeAlertText();
 
-    flashPermanentAlert("Press ENTER to begin");
+    flashPermanentAlert("Press ENTER to begin.");
 
     debugPointsPerLevel = new int[100];
 
